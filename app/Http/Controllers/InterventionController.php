@@ -3,19 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Models\Intervention;
+use Carbon\Carbon;
+use DateTime;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class InterventionController extends Controller
 {
+    /**
+     * Create a new InterventionController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($repairer_id = null, Request $request)
     {
         //
-        return Intervention::all();
+        $interventions = Intervention::with(['products', 'repairTypes', 'repairer', 'customer.city', 'state']);
+
+        switch ($request->filter) {
+            case 'rangeDays':
+                $from = date('Y-m-d');
+
+                $to = date('Y-m-d', strtotime($from . '+' . $request->value . 'days'));
+
+                $interventions = $interventions->whereBetween('data', [$from, $to])->orderBy('data', 'asc');
+                break;
+            case 'repairerDay':
+                $data = date('Y-m-d 00:00:00', strtotime($request->value));
+
+                // $interventions = $interventions->where('repairer_id', $request->repairer_id)->where('data', '=', $data);
+                // //->join('time_slots','interventions.slot_id','=','time_slots.id')->orderBy('time_slots.start');
+                // // $interv = $interventions->get()->load(['timeslots' => function($query){
+                // //     $query->orderBy('start','asc');
+                // // }]);
+                // // return $interv;
+                // $interventions->with(['timeslots' => function ($query) {
+                //     $query->orderBy('start', 'asc');
+                // }]);
+                $interventions->where('repairer_id', $request->repairer_id)
+                    ->where('data', '=', $data)
+                    ->join('time_slots', 'interventions.slot_id', '=', 'time_slots.id')
+                    ->orderBy('time_slots.start', 'asc')
+                    ->select('interventions.*') // Per evitare di sovrascrivere i campi con quelli di timeslots
+                    ->with(['timeslots']);
+                break;
+        }
+
+        if ($repairer_id) {
+            return $interventions->where('repairer_id', $repairer_id)->get();
+        }
+
+        return $interventions->get();
     }
 
     /**
@@ -44,12 +93,14 @@ class InterventionController extends Controller
         $intervention->data = $request->data;
         $intervention->repairer_id = $request->repairer_id;
         $intervention->customer_id = $request->customer_id;
-        $intervention->product_id = $request->product_id;
         $intervention->state_id = $request->state_id;
+        $intervention->slot_id = $request->slot_id;
         $intervention->created_at = now();
         $intervention->updated_at = now();
+        $intervention->garanzia = $request->garanzia;
         $intervention->save();
-        $intervention->repairTypes()->attach($request->repair_type_id);
+        $intervention->repairTypes()->attach($request->repairTypes);
+        $intervention->products()->attach($request->products);
         return $intervention;
     }
 
@@ -63,7 +114,7 @@ class InterventionController extends Controller
     {
         //
         //return $intervention->with('product')->with('customer')->with('repairTypes')->get();
-        return $intervention->with(['product','customer','repairer','repairTypes'])->get();
+        return $intervention->load(['products', 'customer.city', 'repairer', 'repairTypes', 'contract', 'timeslots']);
     }
 
     /**
@@ -93,12 +144,14 @@ class InterventionController extends Controller
         $intervention->data = $request->data;
         $intervention->repairer_id = $request->repairer_id;
         $intervention->customer_id = $request->customer_id;
-        $intervention->product_id = $request->product_id;
         $intervention->state_id = $request->state_id;
+        $intervention->slot_id = $request->slot_id;
         $intervention->created_at = now();
         $intervention->updated_at = now();
+        $intervention->garanzia = $request->garanzia;
         $intervention->save();
-        $intervention->repairTypes()->attach($request->repair_type_id);
+        $intervention->repairTypes()->sync($request->repairTypes);
+        $intervention->products()->sync($request->products);
         return $intervention;
     }
 

@@ -4,18 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
+    public function __construct() {
+        $this->middleware('auth:api');
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        return Customer::all();
+        if($request->search)
+        {
+            return Customer::where(DB::raw("CONCAT(nome,' ',cognome)"),'like','%'.$request->search.'%')->with('city')->get();
+        }
+
+        return Customer::with('city')->get();
     }
 
     /**
@@ -40,7 +50,7 @@ class CustomerController extends Controller
         $customer = new Customer();
         $customer->nome = $request->nome;
         $customer->cognome = $request->cognome;
-        $customer->id_citta = $request->id_citta;
+        $customer->city_id = $request->city_id;
         $customer->indirizzo = $request->indirizzo;
         $customer->telefono = $request->telefono;
         $customer->cellulare = $request->cellulare;
@@ -59,7 +69,7 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         //
-        return $customer->with('city')->get();
+        return $customer->load(['city','contracts','interventions.products','interventions.repairer','interventions.state']);
     }
 
     /**
@@ -85,7 +95,7 @@ class CustomerController extends Controller
         //
         $customer->nome = $request->nome;
         $customer->cognome = $request->cognome;
-        $customer->id_citta = $request->id_citta;
+        $customer->city_id = $request->city_id;
         $customer->indirizzo = $request->indirizzo;
         $customer->telefono = $request->telefono;
         $customer->cellulare = $request->cellulare;;

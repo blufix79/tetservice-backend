@@ -17,7 +17,7 @@ class CreateContractsTable extends Migration
             $table->bigIncrements('id');
             $table->date('data');
             $table->string('descrizione');
-            $table->unsignedBigInteger('id_customer');
+            $table->unsignedBigInteger('customer_id');
             $table->date('scadenza');
             $table->boolean('attivo');
             $table->timestamps();

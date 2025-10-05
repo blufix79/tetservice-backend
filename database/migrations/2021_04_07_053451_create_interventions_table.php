@@ -17,8 +17,8 @@ class CreateInterventionsTable extends Migration
             $table->bigIncrements('id');
             $table->string('titolo');
             $table->string('descrizione');
-            $table->string('note');
-            $table->dateTime('data');
+            $table->string('note')->nullable();
+            $table->date('data');
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('repairer_id');

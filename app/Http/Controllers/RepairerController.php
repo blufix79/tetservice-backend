@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Repairer;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use stdClass;
 
@@ -13,10 +14,11 @@ class RepairerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        return Repairer::all();
+        $repairers = Repairer::with('interventions');
+        return $repairers->get();
     }
 
     /**
@@ -53,10 +55,22 @@ class RepairerController extends Controller
      * @param  \App\Models\Repairer  $repairer
      * @return \Illuminate\Http\Response
      */
-    public function show(Repairer $repairer)
+    public function show(Repairer $repairer, Request $request)
     {
         //
-        return $repairer;
+        switch ($request->filter) {
+            case 'dateIntervention':
+               $data = date('Y-m-d 00:00:00',strtotime($request->value));
+
+                $callBack = function($query) use($data){
+                    $query->where('data','=',$data);
+                };
+
+                return $repairer->whereHas('interventions',$callBack)->with(['interventions.customer'])->get();
+                break;
+        }
+
+        return $repairer->load('interventions');
     }
 
     /**

@@ -17,10 +17,10 @@ class CreateCustomersTable extends Migration
             $table->bigIncrements('id');
             $table->string('nome');
             $table->string('cognome');
-            $table->unsignedBigInteger('id_citta');
+            $table->unsignedBigInteger('city_id');
             $table->string('indirizzo');
-            $table->string('telefono');
-            $table->string('cellulare');
+            $table->string('telefono')->nullable();
+            $table->string('cellulare')->nullable();
             $table->timestamps();
         });
     }

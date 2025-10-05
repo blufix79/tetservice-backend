@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class CityController extends Controller
 {
+    public function __construct() {
+        $this->middleware('auth:api');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +19,7 @@ class CityController extends Controller
     public function index()
     {
         //
-        return City::all();
+        return City::orderBy('comune')->get();
     }
 
     /**
@@ -38,9 +42,10 @@ class CityController extends Controller
     {
         //
         $city = new City();
-        $city->coumune = $request->coumune;
+        $city->comune = $request->comune;
         $city->created_at = now();
         $city->updated_at = now();
+        $city->save();
         return $city;
     }
 
@@ -77,7 +82,7 @@ class CityController extends Controller
     public function update(Request $request, City $city)
     {
         //
-        $city->nome = $request->nome;
+        $city->comune = $request->comune;
         $city->updated_at = now();
         $city->save();
         return $city;

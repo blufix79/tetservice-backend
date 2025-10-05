@@ -34,6 +34,6 @@ class CreateInterventionsRepairTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('interventions_repair_typesclear');
+        Schema::dropIfExists('interventions_repair_types');
     }
 }

@@ -15,7 +15,7 @@ class ProductController extends Controller
     public function index()
     {
         //
-        return Product::all();
+        return Product::with('interventions')->get();
     }
 
     /**
@@ -39,7 +39,7 @@ class ProductController extends Controller
         //
         $product = new Product();
         $product->marca = $request->marca;
-        $product->nome = $request->nome;
+        //$product->nome = $request->nome;
         $product->modello = $request->modello;
         $product->descrizione = $request->descrizione;
         $product->created_at = now();
@@ -83,7 +83,7 @@ class ProductController extends Controller
         //
         $product->marca = $request->marca;
         $product->modello = $request->modello;
-        $product->nome = $request->nome;
+        //$product->nome = $request->nome;
         $product->descrizione = $request->descrizione;
         $product->save();
         return $product;

@@ -10,7 +10,7 @@ Questa è una applicazione backend che espone della API seguendo l'architettura 
 /repairertypes
 /cities
 
-Il layer DB è realizzato attraverso l'utilizzo dei modelli dell'ORM ELoquent e la definizione delle relazioni attraverso i suoi metodi.
+Il layer DB è realizzato attraverso l'utilizzo dei modelli dell'ORM Eloquent e la definizione delle relazioni attraverso i suoi metodi.
 
 
 <p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>

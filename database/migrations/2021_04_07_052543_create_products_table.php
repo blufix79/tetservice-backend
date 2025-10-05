@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->string('marca');
             $table->string('nome');
             $table->string('modello');
-            $table->string('descrizione');
+            $table->string('descrizione')->nullable();
             $table->timestamps();
         });
     }

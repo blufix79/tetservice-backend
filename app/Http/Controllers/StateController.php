@@ -79,7 +79,6 @@ class StateController extends Controller
     {
         //
         $state->nome = $request->nome;
-        $state->created_at = now();
         $state->updated_at = now();
         $state->save();
         return $state;

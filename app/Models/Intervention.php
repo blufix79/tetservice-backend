@@ -12,9 +12,9 @@ class Intervention extends Model
         return $this->belongsToMany(RepairType::class,"interventions_repair_types");
     }
 
-    public function product()
+    public function products()
     {
-        return $this->belongsTo('App\Models\Product');
+        return $this->belongsToMany(Product::class,"interventions_products");
     }
 
     public function customer()
@@ -25,5 +25,20 @@ class Intervention extends Model
     public function repairer()
     {
         return $this->belongsTo(Repairer::class);
+    }
+
+    public function timeslots()
+    {
+        return $this->belongsTo(TimeSlots::class,'slot_id');
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class);
     }
 }
