@@ -30,7 +30,12 @@ class ContractController extends Controller
 
                 $to = date('Y-m-d',strtotime($from.'+'.$request->value.'days'));
 
-                $contracts = $contracts->whereBetween('scadenza',[$from,$to])->orderBy('scadenza','asc');
+                $order = 'asc';
+                if($request->order){
+                    $order = $request->order;
+                }
+
+                $contracts = $contracts->whereBetween('scadenza',[$from,$to])->orderBy('scadenza',$order);
                 break;
         }
 

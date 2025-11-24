@@ -37,20 +37,27 @@ class InterventionController extends Controller
 
                 $to = date('Y-m-d', strtotime($from . '+' . $request->value . 'days'));
 
-                $interventions = $interventions->whereBetween('data', [$from, $to])->orderBy('data', 'asc');
+                $order = 'asc';
+                if ($request->orderDirection) {
+                    $order = $request->orderDirection;
+                }
+
+                $interventions = $interventions->whereBetween('data', [$from, $to])->orderBy('data', $order);
+                break;
+            case 'status':
+                $from = date('Y-m-d');
+
+                $to = date('Y-m-d', strtotime($from . '+' . 30 . 'days'));
+                $order = 'asc';
+
+                if ($request->orderDirection) {
+                    $order = $request->orderDirection;
+                }
+                $interventions = $interventions->where('state_id', $request->value)->whereBetween('data', [$from, $to])->orderBy('data', $order);
                 break;
             case 'repairerDay':
                 $data = date('Y-m-d 00:00:00', strtotime($request->value));
 
-                // $interventions = $interventions->where('repairer_id', $request->repairer_id)->where('data', '=', $data);
-                // //->join('time_slots','interventions.slot_id','=','time_slots.id')->orderBy('time_slots.start');
-                // // $interv = $interventions->get()->load(['timeslots' => function($query){
-                // //     $query->orderBy('start','asc');
-                // // }]);
-                // // return $interv;
-                // $interventions->with(['timeslots' => function ($query) {
-                //     $query->orderBy('start', 'asc');
-                // }]);
                 $interventions->where('repairer_id', $request->repairer_id)
                     ->where('data', '=', $data)
                     ->join('time_slots', 'interventions.slot_id', '=', 'time_slots.id')
@@ -62,6 +69,10 @@ class InterventionController extends Controller
 
         if ($repairer_id) {
             return $interventions->where('repairer_id', $repairer_id)->get();
+        }
+
+        if ($request->orderField && $request->orderDirection) {
+            $interventions = $interventions->orderBy($request->orderField, $request->orderDirection);
         }
 
         return $interventions->get();
