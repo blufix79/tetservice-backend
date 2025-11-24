@@ -164,7 +164,7 @@ class InterventionController extends Controller
         $intervention->repairer_id = $request->repairer_id;
         $intervention->customer_id = $request->customer_id;
         $intervention->state_id = $request->state_id;
-        $intervention->slot_id = $request->slot_id;
+        $intervention->slot_id = $request->state_id === 4 ? null : $request->slot_id;
         $intervention->created_at = now();
         $intervention->updated_at = now();
         $intervention->garanzia = $request->garanzia;
