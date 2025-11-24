@@ -32,10 +32,10 @@ class InterventionController extends Controller
         $interventions = Intervention::with(['products', 'repairTypes', 'repairer', 'customer.city', 'state']);
 
         switch ($request->filter) {
-            case 'rangeDays':
+            case 'lastDays':
                 $from = date('Y-m-d');
 
-                $to = date('Y-m-d', strtotime($from . '+' . $request->value . 'days'));
+                $to = date('Y-m-d', strtotime($from . '+' . $request->to . 'days'));
 
                 $order = 'asc';
                 if ($request->orderDirection) {
@@ -43,6 +43,14 @@ class InterventionController extends Controller
                 }
 
                 $interventions = $interventions->whereBetween('data', [$from, $to])->orderBy('data', $order);
+                break;
+            case 'rangeDate':
+                $order = $request->orderDirection ?? 'asc';
+                if ($request->from && $request->to) {
+                    $interventions = $interventions
+                        ->whereBetween('data', [$request->from, $request->to])
+                        ->orderBy('data', $order);
+                }
                 break;
             case 'status':
                 $from = date('Y-m-d');
